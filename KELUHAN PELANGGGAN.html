@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Operasional - Ananta Net</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- ================= VIEW: LOGIN ================= -->
+    <div id="view-login" class="flex-1 flex items-center justify-center p-4 fade-in relative overflow-hidden">
+        <div class="absolute -top-20 -right-20 w-96 h-96 bg-indigo-600 rounded-full blur-[100px] opacity-20"></div>
+        <div class="absolute -bottom-20 -left-20 w-96 h-96 bg-cyan-400 rounded-full blur-[100px] opacity-20"></div>
+        
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl relative z-10 border border-slate-100">
+            <div class="text-center mb-8 flex flex-col items-center">
+                <div class="bg-indigo-600 p-3 rounded-2xl text-white shadow-lg mb-4 inline-block">
+                    <i class="fa-solid fa-wifi text-3xl"></i>
+                </div>
+                <h1 class="font-extrabold text-2xl tracking-tight leading-none text-slate-900">ANANTA<span class="text-cyan-500">.NET</span></h1>
+                <p class="text-xs text-slate-500 mt-1 font-medium">Sistem Operasional & Layanan</p>
+            </div>
+            
+            <form onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Username</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="login-username" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:ring-2 focus:ring-indigo-600 outline-none transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="password" id="login-password" required class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:ring-2 focus:ring-indigo-600 outline-none transition">
+                    </div>
+                </div>
+                <div id="login-error" class="text-xs text-red-600 font-bold text-center bg-red-50 py-2 rounded-lg hidden border border-red-100">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Username atau password salah!
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl text-sm shadow-lg transition">
+                    Masuk ke Sistem
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= AREA SISTEM ================= -->
+    <div id="app-container" class="hidden flex-1 flex flex-col">
+        
+        <!-- HEADER -->
+        <header class="bg-indigo-900 text-white sticky top-0 z-40 shadow-lg">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-indigo-600 p-2.5 rounded-xl text-white shadow-md">
+                        <i class="fa-solid fa-wifi text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-xl tracking-tight leading-none">ANANTA<span class="text-cyan-400">.NET</span></h1>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleModal('modal-cs')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-3 py-1.5 rounded-lg text-xs flex items-center gap-2 shadow-md transition">
+                        <i class="fa-brands fa-whatsapp text-base"></i>
+                        <span class="hidden sm:inline">Kontak CS</span>
+                    </button>
+                    <div class="flex items-center gap-3 bg-indigo-800/80 px-3 py-1.5 rounded-lg border border-indigo-700">
+                        <div class="text-right text-xs">
+                            <p id="header-user-name" class="font-bold leading-tight">Nama</p>
+                            <p id="header-user-role" class="text-[10px] text-cyan-300 uppercase">Role</p>
+                        </div>
+                        <button onclick="logout()" class="bg-red-500 hover:bg-red-600 transition text-white p-1.5 rounded-lg text-xs" title="Keluar">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT -->
+        <main class="max-w-6xl mx-auto px-4 py-8 w-full flex-1">
+
+            <!-- ================= VIEW: PORTAL PELANGGAN ================= -->
+            <div id="view-pelanggan" class="hidden">
+                <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-xl border border-slate-200/80 max-w-2xl mx-auto fade-in">
+                    <div class="border-b pb-4 mb-6 text-center">
+                        <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full inline-block mb-3">Layanan Pengaduan</span>
+                        <h3 class="text-xl sm:text-2xl font-bold text-slate-900">Buat Laporan Kendala</h3>
+                        <p class="text-xs text-slate-500 mt-2">Silakan isi formulir di bawah ini dengan detail. Teknisi kami akan segera menindaklanjutinya.</p>
+                    </div>
+                    <form id="form-keluhan" onsubmit="submitKeluhan(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">ID Pelanggan (Jika Ingat)</label>
+                                <input type="text" id="input-id-pelanggan" placeholder="Contoh: ANT-1092" class="w-full px-4 py-3 rounded-xl border bg-slate-50 text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Nama Lengkap</label>
+                                <input type="text" id="input-nama" placeholder="Nama Pelanggan" required class="w-full px-4 py-3 rounded-xl border bg-slate-50 text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
+                            </div>
+                        </div>
+                        
+                        <!-- KATEGORI DAN DETAIL KENDALA -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Kategori Kendala</label>
+                            <select id="input-kategori" required class="w-full px-4 py-3 rounded-xl border bg-slate-50 text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
+                                <option value="" disabled selected>-- Pilih Kategori Kendala --</option>
+                                <option value="Internet Mati (Loss Merah)">Internet Mati (Loss / Lampu Merah)</option>
+                                <option value="Koneksi Lambat / Putus-putus">Koneksi Lambat / Putus-putus</option>
+                                <option value="Router Mati Total">Router Mati Total</option>
+                                <option value="Ganti Password WiFi">Ganti Password / Nama WiFi</option>
+                                <option value="Lainnya">Lainnya / Masalah Lain</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Detail Kendala / Keluhan</label>
+                            <textarea id="input-detail" required rows="3" placeholder="Tuliskan secara spesifik... (contoh: Lampu merah kedip-kedip sejak hujan semalam)" class="w-full px-4 py-3 rounded-xl border bg-slate-50 text-sm focus:ring-2 focus:ring-indigo-600 outline-none resize-none"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 mt-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-sm">
+                            <i class="fa-solid fa-paper-plane"></i> Kirim Laporan Gangguan
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ================= VIEW: DASHBOARD STAFF ================= -->
+            <div id="view-staff" class="hidden space-y-6 fade-in">
+                <!-- Navigasi Staff -->
+                <div class="bg-white rounded-xl p-2 shadow-sm border flex gap-2 max-w-md mb-4">
+                    <button onclick="switchStaffTab('staff-tiket')" id="btn-staff-tiket" class="flex-1 py-2 px-3 rounded-lg font-bold text-xs bg-indigo-600 text-white shadow">
+                        <i class="fa-solid fa-clipboard-list"></i> Daftar Tiket
+                    </button>
+                    <button onclick="switchStaffTab('staff-akun')" id="btn-staff-akun" class="flex-1 py-2 px-3 rounded-lg font-semibold text-slate-600 hover:bg-slate-100 text-xs transition">
+                        <i class="fa-solid fa-users-gear"></i> Manajemen Akun
+                    </button>
+                </div>
+
+                <!-- TAB STAFF: DAFTAR TIKET -->
+                <div id="staff-tiket" class="bg-white rounded-2xl p-6 shadow-xl border staff-tab-content">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b pb-4 mb-4 gap-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-900">Manajemen Tiket</h3>
+                            <!-- PEMISAHAN STATUS (TAB) -->
+                            <div class="flex flex-wrap gap-1 mt-3 bg-slate-100 p-1 rounded-lg w-fit border border-slate-200">
+                                <button id="tab-tiket-Semua" onclick="setFilterTiket('Semua')" class="px-4 py-1.5 rounded-md text-xs font-bold bg-white text-indigo-700 shadow-sm transition">Semua</button>
+                                <button id="tab-tiket-Menunggu" onclick="setFilterTiket('Menunggu')" class="px-4 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition">Menunggu</button>
+                                <button id="tab-tiket-Diproses" onclick="setFilterTiket('Diproses')" class="px-4 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition">Diproses</button>
+                                <button id="tab-tiket-Selesai" onclick="setFilterTiket('Selesai')" class="px-4 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition">Selesai</button>
+                            </div>
+                        </div>
+                        
+                        <div class="w-full sm:w-auto">
+                            <div class="relative w-full sm:w-64">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <input type="text" id="search-tiket" onkeyup="renderTeknisiDashboard()" placeholder="Cari ID Tiket atau Nama..." class="w-full pl-8 pr-3 py-2.5 border rounded-xl text-xs bg-slate-50 outline-none focus:ring-1 focus:ring-indigo-600">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                                    <th class="p-3 whitespace-nowrap">ID Tiket</th>
+                                    <th class="p-3 w-48">Pelanggan</th>
+                                    <th class="p-3 max-w-xs">Kendala & Detail</th>
+                                    <th class="p-3">Teknisi PJ</th>
+                                    <th class="p-3 text-center">Status</th>
+                                    <th class="p-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teknisi-ticket-table-body" class="divide-y text-xs"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB STAFF: MANAJEMEN AKUN -->
+                <div id="staff-akun" class="bg-white rounded-2xl p-6 shadow-xl border staff-tab-content hidden">
+                    <div class="flex justify-between items-center border-b pb-4 mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-900">Manajemen Akun</h3>
+                        </div>
+                        <button onclick="bukaFormUser()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-md">
+                            + Tambah Akun
+                        </button>
+                    </div>
+                    
+                    <div id="form-user-container" class="hidden bg-indigo-50/50 p-5 rounded-xl border border-indigo-100 mb-6 relative">
+                        <button onclick="tutupFormUser()" class="absolute top-3 right-4 text-slate-400 hover:text-red-500 transition"><i class="fa-solid fa-xmark text-lg"></i></button>
+                        <h4 id="form-user-title" class="font-bold text-sm mb-4 text-indigo-900">Tambah Akun Baru</h4>
+                        <form onsubmit="simpanUser(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+                            <input type="hidden" id="edit-user-id">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Nama Lengkap</label>
+                                <input type="text" id="edit-nama" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 outline-none bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Username</label>
+                                <input type="text" id="edit-username" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 outline-none bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Password</label>
+                                <input type="text" id="edit-password" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 outline-none bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Role / Jabatan</label>
+                                <select id="edit-role" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-600 outline-none bg-white">
+                                    <option value="teknisi">Teknisi</option>
+                                    <option value="tagihan">Tukang Tagih</option>
+                                    <option value="pelanggan">Pelanggan</option>
+                                    <option value="owner" id="option-owner">Owner</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg text-xs font-bold sm:col-span-4 transition shadow">
+                                Simpan Akun
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                                    <th class="p-3">Nama Pengguna</th>
+                                    <th class="p-3">Username</th>
+                                    <th class="p-3">Password</th>
+                                    <th class="p-3">Role</th>
+                                    <th class="p-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-table-body" class="divide-y text-xs"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL EDIT TIKET -->
+    <div id="modal-edit-tiket" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl relative fade-in">
+            <button onclick="toggleModal('modal-edit-tiket')" class="absolute top-4 right-4 text-slate-400 hover:text-red-500 transition">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="mb-5 border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-900">Edit Data Tiket</h3>
+                <p id="edit-tiket-id-label" class="text-xs text-indigo-600 font-bold mt-1">ID TIKET</p>
+            </div>
+            <form onsubmit="simpanEditTiket(event)" class="space-y-4">
+                <input type="hidden" id="edit-tkt-id">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Pelanggan</label>
+                    <input type="text" id="edit-tkt-nama" required class="w-full px-3 py-2.5 rounded-lg border bg-slate-50 text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">ID Pelanggan (Opsional)</label>
+                    <input type="text" id="edit-tkt-idpel" class="w-full px-3 py-2.5 rounded-lg border bg-slate-50 text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Kategori Kendala</label>
+                    <select id="edit-tkt-kategori" required class="w-full px-3 py-2.5 rounded-lg border bg-slate-50 text-sm focus:ring-2 focus:ring-indigo-600 outline-none">
+                        <option value="Internet Mati (Loss Merah)">Internet Mati (Loss / Lampu Merah)</option>
+                        <option value="Koneksi Lambat / Putus-putus">Koneksi Lambat / Putus-putus</option>
+                        <option value="Router Mati Total">Router Mati Total</option>
+                        <option value="Ganti Password WiFi">Ganti Password / Nama WiFi</option>
+                        <option value="Lainnya">Lainnya / Masalah Lain</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Detail Kendala</label>
+                    <textarea id="edit-tkt-detail" required rows="3" class="w-full px-3 py-2.5 rounded-lg border bg-slate-50 text-sm focus:ring-2 focus:ring-indigo-600 outline-none resize-none"></textarea>
+                </div>
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg shadow transition text-sm">
+                        Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL POPUP CONTACT CS WHATSAPP -->
+    <div id="modal-cs" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl relative">
+            <button onclick="toggleModal('modal-cs')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="text-center mb-6">
+                <h3 class="text-lg font-bold text-slate-900">Layanan WhatsApp Resmi</h3>
+            </div>
+            <div class="space-y-3">
+                <a href="https://wa.me/6285803004649" target="_blank" class="flex items-center justify-between p-3.5 bg-slate-50 border rounded-xl hover:border-emerald-300 transition">
+                    <div>
+                        <h4 class="text-xs font-bold">ANANTA</h4>
+                        <p class="text-[11px] text-slate-500">Owner ANANTA NET - 0858-0300-4649</p>
+                    </div>
+                    <i class="fa-brands fa-whatsapp text-xl text-emerald-500"></i>
+                </a>
+                <a href="https://wa.me/6285283304346" target="_blank" class="flex items-center justify-between p-3.5 bg-slate-50 border rounded-xl hover:border-emerald-300 transition">
+                    <div>
+                        <h4 class="text-xs font-bold">TAUFIK</h4>
+                        <p class="text-[11px] text-slate-500">Teknisi Lapangan - 0852-8330-4346</p>
+                    </div>
+                    <i class="fa-brands fa-whatsapp text-xl text-emerald-500"></i>
+                </a>
+                <a href="https://wa.me/6285645559564" target="_blank" class="flex items-center justify-between p-3.5 bg-slate-50 border rounded-xl hover:border-emerald-300 transition">
+                    <div>
+                        <h4 class="text-xs font-bold">RIDWAN</h4>
+                        <p class="text-[11px] text-slate-500">Bagian Penagihan - 0856-4555-9564</p>
+                    </div>
+                    <i class="fa-brands fa-whatsapp text-xl text-emerald-500"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================= DATABASE LOKAL =================
+        function getDbUsers() {
+            let users = localStorage.getItem('ananta_users_db');
+            if (!users) {
+                const defaultUsers = [
+                    { id: "u1", username: "ananta", password: "123", name: "Ananta (Owner)", role: "owner" },
+                    { id: "u2", username: "taufik", password: "123", name: "Taufik", role: "teknisi" },
+                    { id: "u3", username: "ridwan", password: "123", name: "Ridwan (Penagihan)", role: "tagihan" },
+                    { id: "u4", username: "pelanggan", password: "123", name: "Akun Pelanggan", role: "pelanggan" }
+                ];
+                localStorage.setItem('ananta_users_db', JSON.stringify(defaultUsers));
+                return defaultUsers;
+            }
+            return JSON.parse(users);
+        }
+
+        function saveDbUsers(users) { localStorage.setItem('ananta_users_db', JSON.stringify(users)); }
+
+        function getTickets() {
+            let t = localStorage.getItem('ananta_tickets_db');
+            return t ? JSON.parse(t) : [];
+        }
+
+        function saveTickets(t) { localStorage.setItem('ananta_tickets_db', JSON.stringify(t)); }
+
+        // ================= AUTENTIKASI =================
+        function getCurrentUser() {
+            let u = localStorage.getItem('ananta_session');
+            return u ? JSON.parse(u) : null;
+        }
+
+        function setCurrentUser(user) {
+            if(user) localStorage.setItem('ananta_session', JSON.stringify(user));
+            else localStorage.removeItem('ananta_session');
+            updateUIState();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById('login-username').value.trim();
+            const p = document.getElementById('login-password').value.trim();
+            const err = document.getElementById('login-error');
+            const users = getDbUsers();
+            const match = users.find(user => user.username === u && user.password === p);
+
+            if (match) {
+                err.classList.add('hidden');
+                document.getElementById('login-username').value = '';
+                document.getElementById('login-password').value = '';
+                setCurrentUser(match);
+            } else {
+                err.classList.remove('hidden');
+            }
+        }
+
+        function logout() { setCurrentUser(null); }
+
+        function updateUIState() {
+            const user = getCurrentUser();
+            const viewLogin = document.getElementById('view-login');
+            const appContainer = document.getElementById('app-container');
+            const viewPelanggan = document.getElementById('view-pelanggan');
+            const viewStaff = document.getElementById('view-staff');
+            
+            if (user) {
+                viewLogin.classList.add('hidden');
+                appContainer.classList.remove('hidden');
+                
+                document.getElementById('header-user-name').innerText = user.name;
+                document.getElementById('header-user-role').innerText = user.role;
+
+                if (user.role === 'owner' || user.role === 'teknisi' || user.role === 'tagihan') {
+                    viewPelanggan.classList.add('hidden');
+                    viewStaff.classList.remove('hidden');
+                    renderTeknisiDashboard();
+                    renderUserManagement();
+                    
+                    if(user.role !== 'owner') document.getElementById('option-owner').classList.add('hidden');
+                    else document.getElementById('option-owner').classList.remove('hidden');
+                } else { 
+                    viewPelanggan.classList.remove('hidden');
+                    viewStaff.classList.add('hidden');
+                    document.getElementById('input-nama').value = user.name;
+                }
+            } else {
+                viewLogin.classList.remove('hidden');
+                appContainer.classList.add('hidden');
+                document.getElementById('login-error').classList.add('hidden');
+            }
+        }
+
+        // ================= TIKET =================
+        function submitKeluhan(e) {
+            e.preventDefault();
+            const idPel = document.getElementById('input-id-pelanggan').value;
+            const nama = document.getElementById('input-nama').value;
+            const kat = document.getElementById('input-kategori').value;
+            const detail = document.getElementById('input-detail').value;
+            const tktId = "TKT-" + Math.floor(1000 + Math.random() * 9000);
+            
+            const tickets = getTickets();
+            tickets.unshift({ 
+                ticketId: tktId, 
+                idPelanggan: idPel, 
+                nama: nama, 
+                kategori: kat, 
+                detail: detail,
+                status: "Menunggu", 
+                teknisi: "Belum Ditugaskan" 
+            });
+            saveTickets(tickets);
+            
+            alert("Laporan berhasil dikirim! Teknisi kami akan segera memeriksa.\n\nID Tiket Anda: " + tktId);
+            document.getElementById('form-keluhan').reset();
+            
+            const user = getCurrentUser();
+            if(user) document.getElementById('input-nama').value = user.name;
+        }
+
+        // Filter tab state
+        let currentTiketFilter = 'Semua';
+
+        function setFilterTiket(status) {
+            currentTiketFilter = status;
+            const statuses = ['Semua', 'Menunggu', 'Diproses', 'Selesai'];
+            
+            // Ubah gaya tombol tab yang aktif
+            statuses.forEach(s => {
+                const btn = document.getElementById('tab-tiket-' + s);
+                if(s === status) {
+                    btn.className = "px-4 py-1.5 rounded-md text-xs font-bold bg-white text-indigo-700 shadow-sm transition";
+                } else {
+                    btn.className = "px-4 py-1.5 rounded-md text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-200 transition";
+                }
+            });
+            
+            renderTeknisiDashboard();
+        }
+
+        function renderTeknisiDashboard() {
+            const tbody = document.getElementById('teknisi-ticket-table-body');
+            const searchKeyword = document.getElementById('search-tiket').value.toLowerCase();
+            const tickets = getTickets();
+            
+            const teknisiList = getDbUsers().filter(u => u.role === 'teknisi' || u.role === 'owner' || u.role === 'tagihan');
+
+            // Gunakan currentTiketFilter sebagai ganti select dropdown
+            const filteredTickets = tickets.filter(t => {
+                const matchStatus = currentTiketFilter === 'Semua' || t.status === currentTiketFilter;
+                const matchSearch = t.ticketId.toLowerCase().includes(searchKeyword) || t.nama.toLowerCase().includes(searchKeyword);
+                return matchStatus && matchSearch;
+            });
+
+            tbody.innerHTML = '';
+            
+            if(filteredTickets.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-slate-400 font-medium bg-slate-50/50">Tidak ada tiket dalam kategori ini.</td></tr>`;
+                return;
+            }
+
+            filteredTickets.forEach(t => {
+                let optionsHtml = `<option value="Belum Ditugaskan" ${t.teknisi === 'Belum Ditugaskan' ? 'selected' : ''}>-- Belum Ditugaskan --</option>`;
+                teknisiList.forEach(tk => {
+                    optionsHtml += `<option value="${tk.name}" ${t.teknisi === tk.name ? 'selected' : ''}>${tk.name}</option>`;
+                });
+                
+                if (t.teknisi !== 'Belum Ditugaskan' && !teknisiList.find(tk => tk.name === t.teknisi)) {
+                    optionsHtml += `<option value="${t.teknisi}" selected>${t.teknisi} (Akun Dihapus)</option>`;
+                }
+
+                const displayKategori = t.kategori || "Lainnya";
+                const displayDetail = t.detail ? `"${t.detail}"` : "-";
+
+                // LOGIKA WARNA STATUS
+                let statusColorClass = "border-slate-200 bg-white text-slate-700";
+                if (t.status === "Menunggu") {
+                    statusColorClass = "bg-yellow-50 border-yellow-300 text-yellow-700";
+                } else if (t.status === "Diproses") {
+                    statusColorClass = "bg-blue-50 border-blue-300 text-blue-700";
+                } else if (t.status === "Selesai") {
+                    statusColorClass = "bg-emerald-50 border-emerald-300 text-emerald-700";
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 border-b transition">
+                        <td class="p-3 font-bold text-indigo-600">${t.ticketId}</td>
+                        <td class="p-3">
+                            <div class="font-bold text-slate-800">${t.nama}</div>
+                            <div class="text-[10px] text-slate-500">${t.idPelanggan || '-'}</div>
+                        </td>
+                        <td class="p-3 max-w-xs">
+                            <span class="bg-red-50 border border-red-200 text-red-700 px-2 py-0.5 rounded text-[10px] font-bold mb-1 inline-block">${displayKategori}</span>
+                            <div class="text-slate-600 italic break-words whitespace-normal text-xs mt-1">${displayDetail}</div>
+                        </td>
+                        <td class="p-3">
+                            <select onchange="updateTeknisiTkt('${t.ticketId}', this.value)" class="border border-slate-200 text-[11px] px-2 py-1.5 rounded-lg outline-none cursor-pointer focus:ring-1 focus:ring-indigo-500 bg-white shadow-sm font-semibold max-w-[140px]">
+                                ${optionsHtml}
+                            </select>
+                        </td>
+                        <td class="p-3 text-center">
+                            <select onchange="updateStatusTkt('${t.ticketId}', this.value)" class="border text-[11px] px-2 py-1.5 rounded-lg outline-none cursor-pointer focus:ring-1 focus:ring-indigo-500 shadow-sm font-bold ${statusColorClass}">
+                                <option value="Menunggu" ${t.status==='Menunggu'?'selected':''}>Menunggu</option>
+                                <option value="Diproses" ${t.status==='Diproses'?'selected':''}>Diproses</option>
+                                <option value="Selesai" ${t.status==='Selesai'?'selected':''}>Selesai</option>
+                            </select>
+                        </td>
+                        <td class="p-3 text-center whitespace-nowrap">
+                            <button onclick="bukaEditTiket('${t.ticketId}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-1.5 rounded transition mx-0.5" title="Edit Tiket"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                            <button onclick="hapusTiket('${t.ticketId}')" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded transition mx-0.5" title="Hapus Tiket"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function hapusTiket(id) {
+            if(confirm("Apakah Anda yakin ingin menghapus tiket " + id + " ini?")) {
+                let tkts = getTickets();
+                tkts = tkts.filter(t => t.ticketId !== id);
+                saveTickets(tkts);
+                renderTeknisiDashboard();
+            }
+        }
+
+        function bukaEditTiket(id) {
+            const tkts = getTickets();
+            const t = tkts.find(x => x.ticketId === id);
+            if(t) {
+                document.getElementById('edit-tkt-id').value = t.ticketId;
+                document.getElementById('edit-tiket-id-label').innerText = t.ticketId;
+                document.getElementById('edit-tkt-nama').value = t.nama;
+                document.getElementById('edit-tkt-idpel').value = t.idPelanggan || '';
+                
+                let selectKategori = document.getElementById('edit-tkt-kategori');
+                let foundOption = Array.from(selectKategori.options).some(opt => opt.value === t.kategori);
+                if (foundOption) selectKategori.value = t.kategori;
+                else selectKategori.value = "Lainnya";
+
+                document.getElementById('edit-tkt-detail').value = t.detail || '';
+                
+                toggleModal('modal-edit-tiket');
+            }
+        }
+
+        function simpanEditTiket(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-tkt-id').value;
+            let tkts = getTickets();
+            const idx = tkts.findIndex(t => t.ticketId === id);
+            
+            if(idx > -1) {
+                tkts[idx].nama = document.getElementById('edit-tkt-nama').value;
+                tkts[idx].idPelanggan = document.getElementById('edit-tkt-idpel').value;
+                tkts[idx].kategori = document.getElementById('edit-tkt-kategori').value;
+                tkts[idx].detail = document.getElementById('edit-tkt-detail').value;
+                saveTickets(tkts);
+                toggleModal('modal-edit-tiket');
+                renderTeknisiDashboard();
+            }
+        }
+
+        function updateTeknisiTkt(id, val) {
+            let tkts = getTickets();
+            let idx = tkts.findIndex(t => t.ticketId === id);
+            if(idx > -1) { tkts[idx].teknisi = val; saveTickets(tkts); renderTeknisiDashboard(); }
+        }
+
+        function updateStatusTkt(id, stat) {
+            let tkts = getTickets();
+            let idx = tkts.findIndex(t => t.ticketId === id);
+            if(idx > -1) { 
+                tkts[idx].status = stat; 
+                saveTickets(tkts); 
+                // Jika status diubah lewat tabel dan pengguna sedang berada di tab spesifik, kita render ulang agar tiket tersebut "berpindah" otomatis
+                renderTeknisiDashboard(); 
+            }
+        }
+
+        // ================= MANAJEMEN AKUN =================
+        function renderUserManagement() {
+            const tbody = document.getElementById('user-table-body');
+            const currentUser = getCurrentUser();
+            let users = getDbUsers();
+            if (currentUser.role !== 'owner') users = users.filter(u => u.role !== 'owner');
+
+            tbody.innerHTML = '';
+            users.forEach(u => {
+                let badgeColor = "bg-slate-100 text-slate-600";
+                if(u.role === 'owner') badgeColor = "bg-purple-100 text-purple-700";
+                if(u.role === 'teknisi') badgeColor = "bg-blue-100 text-blue-700";
+                if(u.role === 'tagihan') badgeColor = "bg-amber-100 text-amber-700";
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition border-b">
+                        <td class="p-3 font-bold text-slate-800">${u.name}</td>
+                        <td class="p-3 font-mono text-indigo-600">${u.username}</td>
+                        <td class="p-3 font-mono text-slate-500">${u.password}</td>
+                        <td class="p-3"><span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase ${badgeColor}">${u.role}</span></td>
+                        <td class="p-3 text-center">
+                            <button onclick="editUser('${u.id}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-1.5 rounded transition mx-0.5" title="Edit Akun"><i class="fa-solid fa-pen text-xs"></i></button>
+                            <button onclick="hapusUser('${u.id}')" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded transition mx-0.5" title="Hapus Akun"><i class="fa-solid fa-trash text-xs"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function simpanUser(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-user-id').value;
+            const nama = document.getElementById('edit-nama').value;
+            const user = document.getElementById('edit-username').value;
+            const pass = document.getElementById('edit-password').value;
+            const role = document.getElementById('edit-role').value;
+            let users = getDbUsers();
+
+            if (id) {
+                const index = users.findIndex(u => u.id === id);
+                // Kita abaikan input role jika sedang edit, menggunakan role asli dari database (karena tidak boleh diubah)
+                if(index !== -1) users[index] = { id, name: nama, username: user, password: pass, role: users[index].role };
+            } else {
+                if(users.find(u => u.username === user)) return alert("Gagal: Username sudah dipakai oleh akun lain!");
+                users.push({ id: Date.now().toString(), name: nama, username: user, password: pass, role: role });
+            }
+            saveDbUsers(users); tutupFormUser(); renderUserManagement(); renderTeknisiDashboard();
+        }
+
+        function editUser(id) {
+            const u = getDbUsers().find(x => x.id === id);
+            if(u) {
+                document.getElementById('edit-user-id').value = u.id;
+                document.getElementById('edit-nama').value = u.name;
+                document.getElementById('edit-username').value = u.username;
+                document.getElementById('edit-password').value = u.password;
+                
+                const roleInput = document.getElementById('edit-role');
+                roleInput.value = u.role;
+                roleInput.disabled = true; // KUNCI ROLE
+                roleInput.classList.add('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
+                roleInput.classList.remove('bg-white');
+
+                document.getElementById('form-user-title').innerText = "Edit Akun (Role Tetap)";
+                document.getElementById('form-user-container').classList.remove('hidden');
+            }
+        }
+
+        function hapusUser(id) {
+            const currentUser = getCurrentUser();
+            if(id === currentUser.id) return alert("Anda tidak bisa menghapus akun yang sedang Anda gunakan!");
+            if(confirm("Apakah Anda yakin ingin menghapus akun ini secara permanen?")) {
+                let users = getDbUsers().filter(u => u.id !== id);
+                saveDbUsers(users); renderUserManagement(); renderTeknisiDashboard();
+            }
+        }
+
+        function bukaFormUser() {
+            document.getElementById('form-user-title').innerText = "Tambah Akun Baru";
+            document.getElementById('edit-user-id').value = '';
+            document.getElementById('edit-nama').value = '';
+            document.getElementById('edit-username').value = '';
+            document.getElementById('edit-password').value = '';
+            
+            const roleInput = document.getElementById('edit-role');
+            roleInput.value = 'pelanggan';
+            roleInput.disabled = false; // BUKA ROLE (Karena ini nambah baru)
+            roleInput.classList.remove('bg-slate-100', 'text-slate-500', 'cursor-not-allowed');
+            roleInput.classList.add('bg-white');
+
+            document.getElementById('form-user-container').classList.remove('hidden');
+        }
+
+        function tutupFormUser() { document.getElementById('form-user-container').classList.add('hidden'); }
+
+        function toggleModal(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+            el.classList.toggle('flex');
+        }
+
+        function switchStaffTab(tabId) {
+            document.querySelectorAll('.staff-tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelectorAll('#btn-staff-tiket, #btn-staff-akun').forEach(btn => btn.className = "flex-1 py-2 px-3 rounded-lg font-semibold text-slate-600 hover:bg-slate-100 text-xs transition");
+            document.getElementById('btn-' + tabId).className = "flex-1 py-2 px-3 rounded-lg font-bold text-xs bg-indigo-600 text-white shadow flex items-center justify-center gap-2";
+        }
+
+        window.onload = () => { getDbUsers(); updateUIState(); };
+    </script>
+</body>
+</html>
